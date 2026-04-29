@@ -1,0 +1,43 @@
+# Path to the shared SQLite database
+database_path = "../db/weather_conditions.db"
+
+# ──────────────────────────────────────────────────────────
+# DOM Meteorological stations  (www.dom.org.cy)
+# Full list of available codes:
+#   LEFKOSIA, ATHALASSA, LCLK, LCPH, PAPHOS, LIMASSOL,
+#   CAVO_GRECO, ACHNA, TROODOS, POLIS, ZYGI, …
+# ──────────────────────────────────────────────────────────
+[weather_stations]
+codes = [
+    "LEFKOSIA",   # Nicosia (city centre)
+    "ATHALASSA",  # Nicosia (Athalassa park – used for dashboard)
+    "LCLK",       # Larnaca (airport AWS)
+    "PAPHOS",     # Paphos
+    "LIMASSOL",   # Limassol
+    "CAVO_GRECO", # Agia Napa area
+]
+
+# ──────────────────────────────────────────────────────────
+# Air-quality stations  (www.airquality.dli.mlsi.gov.cy)
+# Names must match exactly the text in the "stations-overview-title"
+# heading on the website.  Full list of available stations:
+#   "Nicosia - Traffic Station"
+#   "Nicosia - Residential Station"
+#   "Limassol - Traffic Station"
+#   "Larnaca - Traffic Station"
+#   "Paphos - Traffic Station"
+#   "Paralimni - Traffic Station"   (nearest to Agia Napa)
+#   "Ayia Marina Xyliatou - Background Station"
+#   "Ormidia - Industrial Station"
+#   "Zygi - Industrial Station"
+#   "Mari - Industrial Station"
+#   "Kalavasos - Industrial Station"
+# ──────────────────────────────────────────────────────────
+[air_quality_stations]
+names = [
+    "Nicosia - Traffic Station",
+    "Larnaca - Traffic Station",
+    "Paphos - Traffic Station",
+    "Limassol - Traffic Station",
+    "Paralimni - Traffic Station",  # nearest to Agia Napa
+]

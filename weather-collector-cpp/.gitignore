@@ -1,0 +1,23 @@
+# CMake build output
+build/
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+compile_commands.json
+
+# Runtime artifacts
+*.log
+*.db
+
+# Editor / IDE
+.zed/
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+
+# Compiled binary (if copied here)
+weather-collector
