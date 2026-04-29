@@ -1,69 +1,57 @@
-# Prerequisites
-*.d
+# Database
+db/*.db
 
-# Compiled Object files
-*.slo
-*.lo
+# Build output
+weather-collector-cpp/build/
+weather-collector-cpp/cmake-build-*/
+weather-collector-cpp/CMakeCache.txt
+weather-collector-cpp/CMakeFiles/
+weather-collector-cpp/compile_commands.json
+weather-collector-cpp/cmake_install.cmake
+weather-collector-cpp/Makefile
+weather-collector-cpp/install_manifest.txt
+
+# Compiled objects / libraries / executables
+*.d
 *.o
 *.obj
-
-# Precompiled Headers
+*.slo
+*.lo
 *.gch
 *.pch
-
-# Linker files
 *.ilk
-
-# Debugger Files
 *.pdb
-
-# Compiled Dynamic libraries
 *.so
+*.so.*
 *.dylib
 *.dll
-*.so.*
-
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
 *.lai
 *.la
 *.a
 *.lib
-
-# Executables
 *.exe
 *.out
 *.app
-
-# Build directories
-build/
-Build/
-build-*/
-
-# CMake generated files
-CMakeFiles/
-CMakeCache.txt
-cmake_install.cmake
-Makefile
-install_manifest.txt
-compile_commands.json
-
-# Temporary files
-*.tmp
-*.log
-*.bak
-*.swp
-
-# vcpkg
-vcpkg_installed/
-
-# debug information files
+*.mod
+*.smod
 *.dwo
 
-# test output & cache
+# Runtime
+*.log
+*.tmp
+*.bak
+
+# Test output
 Testing/
 .cache/
+vcpkg_installed/
+
+# Editor / IDE
+.zed/
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
