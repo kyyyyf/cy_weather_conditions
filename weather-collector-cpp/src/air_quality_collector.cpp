@@ -116,7 +116,7 @@ parse_aq_json(const nlohmann::json& data, std::span<const std::string> names) {
 
     std::vector<StationReading> results;
 
-    for (const auto& [_, station] : data.items()) {        // C++26: _ placeholder
+    for (const auto& [sid, station] : data.items()) {
         if (!station.is_object()) continue;
 
         const auto name_en = std::string{trim_sv(station.value("name_en", std::string{}))};
@@ -125,7 +125,7 @@ parse_aq_json(const nlohmann::json& data, std::span<const std::string> names) {
         const auto values = station.find("values");
         if (values == station.end() || !values->is_object()) continue;
 
-        for (const auto& [_, hourly] : values->items()) {  // C++26: _ reuse
+        for (const auto& [hid, hourly] : values->items()) {
             if (!hourly.is_object()) continue;
 
             const auto polls = hourly.find("pollutants");
