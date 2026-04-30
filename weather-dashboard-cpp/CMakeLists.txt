@@ -25,14 +25,25 @@ set(CROW_BUILD_EXAMPLES OFF CACHE INTERNAL "")
 set(CROW_BUILD_TESTS    OFF CACHE INTERNAL "")
 FetchContent_MakeAvailable(crow)
 
-# ── Inja (Jinja2-like templates, uses nlohmann/json internally) ───────────────
+# ── nlohmann/json (declared first so Inja reuses our target) ─────────────────
+FetchContent_Declare(nlohmann_json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG        v3.11.3
+    GIT_SHALLOW    TRUE
+)
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+set(JSON_Install    OFF CACHE INTERNAL "")
+FetchContent_MakeAvailable(nlohmann_json)
+
+# ── Inja (Jinja2-like templates) ─────────────────────────────────────────────
 FetchContent_Declare(inja
     GIT_REPOSITORY https://github.com/pantor/inja.git
     GIT_TAG        v3.4.0
     GIT_SHALLOW    TRUE
 )
-set(INJA_BUILD_TESTS OFF CACHE INTERNAL "")
-set(INJA_EXPORT      OFF CACHE INTERNAL "")
+set(INJA_BUILD_TESTS    OFF CACHE INTERNAL "")
+set(INJA_EXPORT         OFF CACHE INTERNAL "")
+set(INJA_USE_EXTERNAL_JSON ON CACHE INTERNAL "")  # reuse the nlohmann_json target above
 FetchContent_MakeAvailable(inja)
 
 # ── toml++ ───────────────────────────────────────────────────────────────────
@@ -41,15 +52,7 @@ FetchContent_Declare(tomlplusplus
     GIT_TAG        v3.4.0
     GIT_SHALLOW    TRUE
 )
-# ── nlohmann/json (also pulled transitively by inja) ─────────────────────────
-FetchContent_Declare(nlohmann_json
-    GIT_REPOSITORY https://github.com/nlohmann/json.git
-    GIT_TAG        v3.11.3
-    GIT_SHALLOW    TRUE
-)
-set(JSON_BuildTests OFF CACHE INTERNAL "")
-set(JSON_Install    OFF CACHE INTERNAL "")
-FetchContent_MakeAvailable(tomlplusplus nlohmann_json)
+FetchContent_MakeAvailable(tomlplusplus)
 
 find_package(SQLite3  REQUIRED)
 find_package(Threads  REQUIRED)
