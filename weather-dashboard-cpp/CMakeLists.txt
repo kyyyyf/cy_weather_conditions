@@ -3,6 +3,9 @@ project(weather-dashboard-cpp VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+find_package(SQLite3  REQUIRED)
+find_package(Threads  REQUIRED)
+
 include(FetchContent)
 
 # ── Asio (standalone, required by Crow) ──────────────────────────────────────
@@ -60,9 +63,6 @@ FetchContent_Declare(tomlplusplus
     GIT_SHALLOW    TRUE
 )
 FetchContent_MakeAvailable(tomlplusplus)
-
-find_package(SQLite3  REQUIRED)
-find_package(Threads  REQUIRED)
 
 # ── Target ───────────────────────────────────────────────────────────────────
 add_executable(weather-dashboard
