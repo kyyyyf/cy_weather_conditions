@@ -1,49 +1,51 @@
-# cy_weather_conditions / weather-collector-cpp
+# cy_weather_conditions
 
 ## Stack
 
 | | |
 |---|---|
-| Language | C++26 |
-| Compiler | GCC 14+ or Clang 17+ (Apple Clang — via fallback) |
-| Build system | CMake ≥ 3.26 |
-| System dependencies | libcurl, SQLite3 |
-| FetchContent dependencies | toml++ v3.4.0, nlohmann/json v3.11.3, pugixml v1.14 |
+| Language | C++23 |
+| Compiler | GCC 13+ or Clang 17+ (Apple Clang — via fallback) |
+| Build system | CMake ≥ 3.26 + root-level `Makefile` |
+| Collector deps | libcurl, SQLite3, toml++ v3.4.0, nlohmann/json v3.11.3, pugixml v1.14 |
+| Dashboard deps | SQLite3, Crow v1.2.0, Inja v3.4.0, Asio, toml++ v3.4.0, nlohmann/json v3.11.3 |
 
 ## Commands
 
 ```bash
-# ── Local (native) ────────────────────────────────────────────────────────────
-# Release build
-cmake -B weather-collector-cpp/build -S weather-collector-cpp -DCMAKE_BUILD_TYPE=Release
-cmake --build weather-collector-cpp/build -j$(nproc)
+# ── Build both (from repo root) ───────────────────────────────────────────────
+make                          # Release (default)
+make BUILD_TYPE=Debug         # Debug — enables ASan + UBSan
+make CC=gcc-14 CXX=g++-14     # explicit compiler version
+make collector                # collector only
+make dashboard                # dashboard only
+make clean                    # remove both build dirs
 
-# Debug build — enables ASan + UBSan
-cmake -B weather-collector-cpp/build -S weather-collector-cpp -DCMAKE_BUILD_TYPE=Debug
-cmake --build weather-collector-cpp/build
-
-# Run (local)
+# ── Run (from repo root) ──────────────────────────────────────────────────────
 cd weather-collector-cpp && ./build/weather-collector config.toml
+cd weather-dashboard-cpp && ./build/weather-dashboard config.toml
 
-# ── Docker (production) ───────────────────────────────────────────────────────
-docker compose build          # build image (first time or after source changes)
-docker compose run --rm collector   # run once manually
-docker compose logs collector       # view logs from last run
-
-# Tests — none exist (no tests/ directory)
+# ── Tests — none exist (no tests/ directory) ──────────────────────────────────
 ```
 
-Binary: `weather-collector-cpp/build/weather-collector`  
-Docker config: `weather-collector-cpp/config.docker.toml`
+Binaries:
+- `weather-collector-cpp/build/weather-collector`
+- `weather-dashboard-cpp/build/weather-dashboard`
 
 ## Project structure
 
 | Directory / file | Contents |
 |---|---|
-| `weather-collector-cpp/src/` | All C++ source code |
-| `weather-collector-cpp/CMakeLists.txt` | Build system, dependencies |
-| `weather-collector-cpp/config.toml` | Default config (paths, station lists) |
+| `weather-collector-cpp/src/` | Collector C++ source |
+| `weather-collector-cpp/CMakeLists.txt` | Collector build, dependencies |
+| `weather-collector-cpp/config.toml` | Collector config (DB path, station lists) |
+| `weather-dashboard-cpp/src/` | Dashboard C++ source |
+| `weather-dashboard-cpp/CMakeLists.txt` | Dashboard build, dependencies |
+| `weather-dashboard-cpp/config.toml` | Dashboard config (DB path, port, locations) |
+| `weather-dashboard-cpp/templates/` | Inja HTML templates |
+| `weather-dashboard-cpp/static/` | CSS + JS assets |
 | `db/` | Runtime SQLite database (only `.gitkeep` in git) |
+| `deploy/` | systemd unit file for the dashboard |
 | `docs/knowledge/` | Per-module knowledge files |
 | `docs/adr/` | Architectural decision records |
 
