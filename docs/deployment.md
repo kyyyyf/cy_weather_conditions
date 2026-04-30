@@ -2,84 +2,112 @@
 
 ## Overview
 
-Two separate Docker Compose stacks share a single named volume (`cy_weather_db`).
-The collector writes to it every 30 minutes; the web app reads from it (read-only).
+Both binaries run natively on the VPS. The collector is invoked by cron every 30 minutes; the dashboard runs as a systemd service on port 3000. They share a single SQLite file.
 
 ```
-[host cron]
-    └── docker compose run --rm collector
-            └── writes /data/weather_conditions.db
-                         │
-                    cy_weather_db volume
-                         │
-            └── webapp container reads /data/weather_conditions.db (ro)
+[host cron every 30 min]
+    └── weather-collector config.toml
+            └── writes /opt/cy_weather_conditions/db/weather_conditions.db
+                                  │
+                        shared SQLite file (same filesystem)
+                                  │
+    [systemd: weather-dashboard]
+            └── reads db (read-only)  →  serves http://localhost:3000
 ```
 
-## Collector stack (this repo)
+---
 
-### First-time setup on the VPS
+## System dependencies (Ubuntu 24.04)
+
+```bash
+sudo apt-get update
+sudo apt-get install -y \
+    cmake ninja-build \
+    gcc g++ \
+    libsqlite3-dev \
+    libcurl4-openssl-dev \
+    git ca-certificates
+```
+
+> On Ubuntu 22.04 add the `ubuntu-toolchain-r/test` PPA to get gcc-13+.
+
+---
+
+## First-time setup on the VPS
 
 ```bash
 git clone <repo> /opt/cy_weather_conditions
 cd /opt/cy_weather_conditions
 
-# Build the image (takes a few minutes — downloads FetchContent deps)
-docker compose build
+# Build both binaries (Release)
+make -j$(nproc)
 
-# Smoke test — should log "collection started" and "collection complete"
-docker compose run --rm collector
+# Create the DB directory (gitignored, empty)
+mkdir -p db
+
+# Smoke test — should print "collection complete"
+cd weather-collector-cpp && ./build/weather-collector config.toml
 ```
 
-### Cron
+Binary locations after build:
+- `weather-collector-cpp/build/weather-collector`
+- `weather-dashboard-cpp/build/weather-dashboard`
+
+---
+
+## Collector — cron
 
 Add to the VPS crontab (`crontab -e`):
 
 ```cron
-*/30 * * * * cd /opt/cy_weather_conditions && docker compose run --rm collector >> /var/log/cy_weather.log 2>&1
-```
-
-`docker compose run --rm` starts a fresh container, runs the collector once, then removes the container. The named volume persists between runs.
-
-### Updating
-
-```bash
-cd /opt/cy_weather_conditions
-git pull
-docker compose build
-# Next cron tick picks up the new image automatically
+*/30 * * * * cd /opt/cy_weather_conditions/weather-collector-cpp && ./build/weather-collector config.toml >> /var/log/cy_weather_collector.log 2>&1
 ```
 
 ---
 
-## Web app stack (separate repo)
+## Dashboard — systemd service
 
-In the web app's `docker-compose.yml`, reference the collector's volume as external:
+```bash
+# Copy the unit file
+sudo cp /opt/cy_weather_conditions/deploy/weather-dashboard.service \
+        /etc/systemd/system/
 
-```yaml
-volumes:
-  cy_weather_db:
-    external: true       # must already exist — created by the collector stack
-    name: cy_weather_db
+# Reload and enable
+sudo systemctl daemon-reload
+sudo systemctl enable --now weather-dashboard
 
-services:
-  webapp:
-    # ... your image / build ...
-    volumes:
-      - cy_weather_db:/data:ro
-    environment:
-      DB_PATH: /data/weather_conditions.db
+# Check status
+sudo systemctl status weather-dashboard
+sudo journalctl -u weather-dashboard -f
 ```
 
-The web app reads the SQLite file at `/data/weather_conditions.db`.  
-Mount is read-only (`:ro`) — the web app must never write to this file.
+The service runs as `www-data`. If you deploy under a different user, edit the `User=` line in the unit file.
 
-> **Important:** start the collector stack first so the volume exists before the web app stack starts.
+---
+
+## Updating
+
+```bash
+cd /opt/cy_weather_conditions
+git pull
+make -j$(nproc)
+sudo systemctl restart weather-dashboard
+# Next cron tick picks up the new collector binary automatically
+```
+
+---
+
+## Config paths
+
+Both projects ship with a `config.toml` whose `database_path` is set to `../db/weather_conditions.db` (relative to the project subdirectory). This resolves to `/opt/cy_weather_conditions/db/weather_conditions.db` when the binary is run from its project directory, which is what the cron line and the systemd `WorkingDirectory` both ensure.
+
+To use an absolute path instead, edit the `database_path` value in each `config.toml`.
 
 ---
 
 ## Database schema reference
 
-Tables written by the collector and read by the web app:
+Tables written by the collector and read by the dashboard:
 
 ```sql
 weather_observations (
@@ -96,39 +124,16 @@ air_quality_observations (
     id           INTEGER PRIMARY KEY,
     station_name TEXT    NOT NULL,
     timestamp    TEXT    NOT NULL,   -- "YYYY-MM-DD HH:MM"
-    pollutant    TEXT    NOT NULL,   -- ASCII: "PM10", "PM25", "NO2", "O3", "SO2", "CO", "C6H6"
+    pollutant    TEXT    NOT NULL,   -- "PM10", "PM25", "NO2", "O3", "SO2", "CO", "C6H6"
     value        REAL,               -- NULL when station reports N/A
     unit         TEXT    NOT NULL,   -- "mg/m³" for CO, "μg/m³" otherwise
     UNIQUE(station_name, timestamp, pollutant)
 )
 ```
 
-Useful query patterns:
-
-```sql
--- Latest reading per station (weather)
-SELECT station_code, MAX(timestamp), obs_name, obs_value, obs_unit
-FROM weather_observations
-GROUP BY station_code, obs_name;
-
--- All air quality readings for the last hour
-SELECT *
-FROM air_quality_observations
-WHERE timestamp >= datetime('now', '-1 hour');
-```
-
 ---
 
 ## Logs
 
-Container stdout/stderr is captured by Docker:
-
-```bash
-# Last run logs
-docker compose logs collector
-
-# Live tail during a manual run
-docker compose run --rm collector
-```
-
-Persistent log file is also written to the shared volume at `/data/collector.log`.
+- Collector: `/var/log/cy_weather_collector.log` (written by cron redirection)
+- Dashboard: `journalctl -u weather-dashboard`

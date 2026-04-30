@@ -1,6 +1,7 @@
 #include "config.hpp"
 #include "database.hpp"
 
+#include <thread>  // must precede crow.h on Apple Clang (std::this_thread::yield)
 #include <crow.h>
 #include <inja/inja.hpp>
 #include <nlohmann/json.hpp>

@@ -25,26 +25,33 @@ set(CROW_BUILD_EXAMPLES OFF CACHE INTERNAL "")
 set(CROW_BUILD_TESTS    OFF CACHE INTERNAL "")
 FetchContent_MakeAvailable(crow)
 
-# ── nlohmann/json (declared first so Inja reuses our target) ─────────────────
+# ── nlohmann/json ────────────────────────────────────────────────────────────
 FetchContent_Declare(nlohmann_json
     GIT_REPOSITORY https://github.com/nlohmann/json.git
     GIT_TAG        v3.11.3
     GIT_SHALLOW    TRUE
 )
-set(JSON_BuildTests OFF CACHE INTERNAL "")
-set(JSON_Install    OFF CACHE INTERNAL "")
+set(JSON_BuildTests OFF CACHE BOOL "" FORCE)
+set(JSON_Install    OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(nlohmann_json)
 
 # ── Inja (Jinja2-like templates) ─────────────────────────────────────────────
+# Inja v3.4.0 has unconditional install()/export() calls that break when used
+# as a FetchContent sub-project. We populate the source only and create the
+# interface target manually to avoid that.
 FetchContent_Declare(inja
     GIT_REPOSITORY https://github.com/pantor/inja.git
     GIT_TAG        v3.4.0
     GIT_SHALLOW    TRUE
 )
-set(INJA_BUILD_TESTS    OFF CACHE INTERNAL "")
-set(INJA_EXPORT         OFF CACHE INTERNAL "")
-set(INJA_USE_EXTERNAL_JSON ON CACHE INTERNAL "")  # reuse the nlohmann_json target above
-FetchContent_MakeAvailable(inja)
+FetchContent_GetProperties(inja)
+if(NOT inja_POPULATED)
+    FetchContent_Populate(inja)
+endif()
+add_library(inja INTERFACE)
+add_library(pantor::inja ALIAS inja)
+target_include_directories(inja INTERFACE "${inja_SOURCE_DIR}/include")
+target_link_libraries(inja INTERFACE nlohmann_json::nlohmann_json)
 
 # ── toml++ ───────────────────────────────────────────────────────────────────
 FetchContent_Declare(tomlplusplus

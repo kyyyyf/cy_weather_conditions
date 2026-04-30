@@ -1,0 +1,14 @@
+[Unit]
+Description=Cyprus Weather Dashboard
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/opt/cy_weather_conditions/weather-dashboard-cpp
+ExecStart=/opt/cy_weather_conditions/weather-dashboard-cpp/build/weather-dashboard config.toml
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
