@@ -1,4 +1,5 @@
 #include "database.hpp"
+#include <algorithm>
 #include <format>
 #include <unordered_map>
 
