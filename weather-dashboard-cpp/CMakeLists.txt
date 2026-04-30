@@ -3,8 +3,16 @@ project(weather-dashboard-cpp VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-find_package(SQLite3  REQUIRED)
-find_package(Threads  REQUIRED)
+find_package(SQLite3 REQUIRED)
+# Crow's internal find_package(SQLite3) can populate the cache without
+# creating the imported target. Create it manually as a fallback.
+if(NOT TARGET SQLite3::SQLite3)
+    add_library(SQLite3::SQLite3 IMPORTED UNKNOWN)
+    set_target_properties(SQLite3::SQLite3 PROPERTIES
+        IMPORTED_LOCATION             "${SQLite3_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${SQLite3_INCLUDE_DIR}")
+endif()
+find_package(Threads REQUIRED)
 
 include(FetchContent)
 
