@@ -67,6 +67,13 @@ sudo apt-get install -y \
 > sudo apt-get update
 > ```
 
+> **If cmake reports a library as not found after you install it**, delete the build
+> directory and re-run cmake — it caches "not found" results and will keep failing
+> until the cache is cleared:
+> ```bash
+> rm -rf weather-collector-cpp/build weather-dashboard-cpp/build
+> ```
+
 ---
 
 ## 2. Build
