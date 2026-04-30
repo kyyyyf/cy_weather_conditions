@@ -1,0 +1,28 @@
+services:
+
+  # ── Collector: run-and-exit, triggered by host cron every 30 min ──────────
+  collector:
+    build:
+      context: ./weather-collector-cpp
+    volumes:
+      - ./weather-collector-cpp/config.docker.toml:/app/config.toml:ro
+      - cy_weather_db:/data
+    restart: "no"
+
+  # ── Dashboard: always-on HTTP server on port 3000 ─────────────────────────
+  dashboard:
+    build:
+      context: ./weather-dashboard-cpp
+    volumes:
+      - ./weather-dashboard-cpp/config.docker.toml:/app/config.toml:ro
+      - cy_weather_db:/data:ro        # read-only — never writes to the DB
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    depends_on:
+      - collector                     # ensures volume is created first
+
+# Named volume shared between collector (rw) and dashboard (ro)
+volumes:
+  cy_weather_db:
+    name: cy_weather_db

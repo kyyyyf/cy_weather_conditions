@@ -10,6 +10,14 @@ weather-collector-cpp/compile_commands.json
 weather-collector-cpp/cmake_install.cmake
 weather-collector-cpp/Makefile
 weather-collector-cpp/install_manifest.txt
+weather-dashboard-cpp/build/
+weather-dashboard-cpp/cmake-build-*/
+weather-dashboard-cpp/CMakeCache.txt
+weather-dashboard-cpp/CMakeFiles/
+weather-dashboard-cpp/compile_commands.json
+weather-dashboard-cpp/cmake_install.cmake
+weather-dashboard-cpp/Makefile
+weather-dashboard-cpp/install_manifest.txt
 
 # Compiled objects / libraries / executables
 *.d

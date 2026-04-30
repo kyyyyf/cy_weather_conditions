@@ -1,0 +1,53 @@
+database_path = "../db/weather_conditions.db"
+port          = 3000
+
+[[locations]]
+name         = "Nicosia"
+weather_code = "ATHALASSA"
+aq_station   = "Nicosia - Traffic Station"
+
+[[locations]]
+name         = "Larnaca"
+weather_code = "LCLK"
+aq_station   = "Larnaca - Traffic Station"
+
+[[locations]]
+name         = "Limassol"
+weather_code = "LIMASSOL"
+aq_station   = "Limassol - Traffic Station"
+
+[[locations]]
+name         = "Paphos"
+weather_code = "PAPHOS"
+aq_station   = "Paphos - Traffic Station"
+
+[[locations]]
+name         = "Agia Napa"
+weather_code = "CAVO_GRECO"
+aq_station   = "Paralimni - Traffic Station"
+
+# ── Air quality thresholds (EU/WHO reference bands) ───────────────────────────
+# Three boundaries divide each pollutant into four bands:
+#   Good | Moderate | High | Very High
+# Units: μg/m³ for all; CO in μg/m³ (1 mg/m³ = 1000 μg/m³)
+
+[aq_thresholds.PM10]
+low = 50.0; moderate = 100.0; high = 200.0
+
+[aq_thresholds."PM2.5"]
+low = 25.0; moderate = 50.0; high = 100.0
+
+[aq_thresholds.O3]
+low = 100.0; moderate = 140.0; high = 180.0
+
+[aq_thresholds.NO2]
+low = 100.0; moderate = 150.0; high = 200.0
+
+[aq_thresholds.SO2]
+low = 150.0; moderate = 250.0; high = 350.0
+
+[aq_thresholds.CO]
+low = 7000.0; moderate = 15000.0; high = 20000.0
+
+[aq_thresholds.C6H6]
+low = 5.0; moderate = 10.0; high = 15.0

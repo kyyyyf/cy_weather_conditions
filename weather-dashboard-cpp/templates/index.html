@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cyprus Weather &amp; Air Quality</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <script src="https://unpkg.com/htmx.org@2/dist/htmx.min.js"></script>
+  <script src="/static/charts.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>Cyprus Weather &amp; Air Quality</h1>
+      <span class="subtitle">Real-time conditions by location</span>
+    </header>
+    <main class="main">
+      <div class="loc-bar">
+        <label class="loc-label" for="loc-select">Location</label>
+        <select id="loc-select" class="loc-select"
+          name="location"
+          hx-get="/dashboard"
+          hx-target="#content"
+          hx-swap="innerHTML"
+          hx-trigger="change"
+          hx-indicator="#spinner">
+          <option value="">— Select a city —</option>
+          {% for loc in locations %}
+          <option value="{{ loc }}">{{ loc }}</option>
+          {% endfor %}
+        </select>
+        <span id="spinner" class="htmx-indicator muted" style="font-size:0.8rem">Loading…</span>
+      </div>
+      <div id="content" class="content-area">
+        <div class="placeholder">
+          <span class="icon">☀</span>
+          <span>Select a location above</span>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
