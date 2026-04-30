@@ -1,0 +1,124 @@
+<div class="dashboard"
+  hx-get="/dashboard"
+  hx-target="#content"
+  hx-swap="innerHTML"
+  hx-trigger="every 5m"
+  hx-vals='{"location": "{{ location }}"}'>
+
+  <!-- Row 1: current conditions card + AQ detail table -->
+  <div class="top-row">
+
+    <!-- Current conditions -->
+    <div class="cond-card">
+      <div class="cond-top">
+        <span class="cond-picto">🌡</span>
+        <span class="cond-temp-val">{{ temp_cur }}</span>
+        <div class="curr-mm">
+          {% if has_temp_max %}
+          <span class="mm-item hi">
+            <span class="mm-arrow">▲</span>{{ temp_max_val }}
+            <span class="mm-time">{{ temp_max_time }}</span>
+          </span>
+          {% endif %}
+          {% if has_temp_min %}
+          <span class="mm-item lo">
+            <span class="mm-arrow">▼</span>{{ temp_min_val }}
+            <span class="mm-time">{{ temp_min_time }}</span>
+          </span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="cond-bottom">
+        <div class="cond-sub">
+          <span class="cond-picto">💧</span>
+          <span class="cond-sub-val">{{ humid_cur }}</span>
+        </div>
+        <div class="cond-sub">
+          <span class="cond-picto">💨</span>
+          <span class="cond-sub-val">{{ compass }}</span>
+          <span class="cond-sub-label">{{ wind_speed_str }}</span>
+        </div>
+        <div class="cond-sub">
+          <span class="aq-badge-main" style="background:{{ worst_aq_color }}">{{ worst_aq_label }}</span>
+          {% if has_pm10 %}
+          <div class="aq-pm-rows">
+            <div class="aq-pm-row">
+              <span class="aq-dot" style="background:{{ pm10_color }}"></span>
+              <span class="aq-pm-name">PM₁₀</span>
+              <span class="aq-pm-val">{{ pm10_val }} μg/m³</span>
+            </div>
+            {% if has_pm25 %}
+            <div class="aq-pm-row">
+              <span class="aq-dot" style="background:{{ pm25_color }}"></span>
+              <span class="aq-pm-name">PM₂.₅</span>
+              <span class="aq-pm-val">{{ pm25_val }} μg/m³</span>
+            </div>
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- AQ detail table -->
+    {% if has_aq %}
+    <div class="data-card aq-detail">
+      <div class="card-title">Air Quality — All Pollutants</div>
+      <table class="aq-table">
+        <thead>
+          <tr><th>Pollutant</th><th>Value</th><th>Unit</th><th>Index</th></tr>
+        </thead>
+        <tbody>
+          {% for row in aq_rows %}
+          <tr>
+            <td>{{ row.name }}</td>
+            <td class="num">{{ row.val }}</td>
+            <td>{{ row.unit }}</td>
+            <td><span class="aq-lbl" style="color:{{ row.color }}">{{ row.label }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- Row 2: ECharts line charts — data embedded in data-* attributes -->
+  <div class="charts-row">
+
+    {% if has_chart_temp %}
+    <div class="data-card chart-card">
+      <div class="card-title">🌡 Temperature</div>
+      <div class="mini-chart"
+        data-chart="line"
+        data-color="#4fc3f7"
+        data-unit="°C"
+        data-points='{{ chart_temp }}'></div>
+    </div>
+    {% endif %}
+
+    {% if has_chart_humid %}
+    <div class="data-card chart-card">
+      <div class="card-title">💧 Humidity</div>
+      <div class="mini-chart"
+        data-chart="line"
+        data-color="#81c784"
+        data-unit="%"
+        data-points='{{ chart_humid }}'></div>
+    </div>
+    {% endif %}
+
+    {% if has_chart_wind %}
+    <div class="data-card chart-card">
+      <div class="card-title">💨 Wind Speed</div>
+      <div class="mini-chart"
+        data-chart="wind"
+        data-color="#4fc3f7"
+        data-speed='{{ chart_wind_speed }}'
+        data-direction='{{ chart_wind_dir }}'></div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
