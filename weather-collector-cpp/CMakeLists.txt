@@ -31,6 +31,12 @@ FetchContent_MakeAvailable(tomlplusplus nlohmann_json pugixml)
 
 find_package(CURL    REQUIRED)
 find_package(SQLite3 REQUIRED)
+if(NOT TARGET SQLite3::SQLite3)
+    add_library(SQLite3::SQLite3 IMPORTED UNKNOWN)
+    set_target_properties(SQLite3::SQLite3 PROPERTIES
+        IMPORTED_LOCATION             "${SQLite3_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${SQLite3_INCLUDE_DIR}")
+endif()
 
 # ── Target ────────────────────────────────────────────────────────────────────
 add_executable(weather-collector
